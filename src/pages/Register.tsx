@@ -1,0 +1,107 @@
+import {
+  useState
+} from "react";
+
+import {
+  createUserWithEmailAndPassword
+} from "firebase/auth";
+
+import {
+  auth
+} from "../firebase/firebaseConfig";
+
+import {
+  useNavigate,
+  Link
+} from "react-router-dom";
+
+function Register() {
+
+  const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  
+  const handleRegister = async (
+    e: React.FormEvent<HTMLFormElement>
+  ) => {
+
+    e.preventDefault();
+
+    setError("");
+
+    setLoading(true);
+
+    try {
+
+      await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+
+      navigate("/blogs");
+
+    } catch (error:any) {
+
+      setError(error?.message);
+
+    } finally {
+
+      setLoading(false);
+
+    }
+
+  };
+
+  return (
+
+    <div>
+
+      <h1>Register</h1>
+
+      <form onSubmit={handleRegister}>
+
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
+
+        <button
+          type="submit"
+          disabled={loading}
+        >
+          {loading ? "Registering..." : "Register"}
+        </button>
+
+      </form>
+
+      {error && <p>{error}</p>}
+
+      <p>
+        Already have an account?
+
+        <Link to="/login">
+          Login
+        </Link>
+      </p>
+
+    </div>
+
+  );
+
+}
+
+export default Register;
